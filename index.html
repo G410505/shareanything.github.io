@@ -3,31 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SendFile - إرسال الملفات عبر الشبكة</title>
+    <title>مشاركة الملفات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 </head>
 <body>
-    <header>
-        <h1><i class="fas fa-file-upload"></i> SendFile</h1>
-        <p>إرسال واستقبال الملفات بسهولة وأمان عبر الشبكة</p>
-    </header>
-
-    <main>
-        <div class="container">
-            <h2>اختر ملفًا لإرساله</h2>
-            <input type="file" id="fileInput">
-            <button id="sendButton"><i class="fas fa-paper-plane"></i> إرسال الملف</button>
-            <button id="receiveButton"><i class="fas fa-download"></i> استقبال الملف</button>
-        </div>
-    </main>
-
-    <footer>
-        <p>© 2025 SendFile - جميع الحقوق محفوظة</p>
-    </footer>
-
+    <h1>شارك الملفات بسهولة</h1>
+    <input type="file" id="fileInput">
+    <button id="sendFile">إرسال</button>
+    <div id="status"></div>
+    
     <script src="script.js"></script>
 </body>
 </html>
