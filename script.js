@@ -1,68 +1,42 @@
-let peerConnection;
-let dataChannel;
+document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("fileInput");
+    const sendFileButton = document.getElementById("sendFile");
+    const statusDiv = document.getElementById("status");
 
-// إنشاء الاتصال عند تحميل الصفحة
-function createConnection() {
-    peerConnection = new RTCPeerConnection();
-    dataChannel = peerConnection.createDataChannel("fileTransfer");
-
-    dataChannel.onopen = () => console.log("قناة الاتصال مفتوحة");
-    dataChannel.onclose = () => console.log("قناة الاتصال مغلقة");
-    
-    dataChannel.onmessage = (event) => {
-        const receivedFile = event.data;
-        const blob = new Blob([receivedFile]);
-        const downloadLink = document.createElement("a");
-        downloadLink.href = URL.createObjectURL(blob);
-        downloadLink.download = "received_file";
-        downloadLink.innerText = "تحميل الملف المستلم";
-        document.body.appendChild(downloadLink);
-    };
-
-    peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-            document.getElementById("offer").value = JSON.stringify(peerConnection.localDescription);
-        }
-    };
-}
-
-// توليد عرض اتصال (Offer) للطرف الآخر
-async function createOffer() {
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
-    document.getElementById("offer").value = JSON.stringify(offer);
-}
-
-// قبول الطلب من الجهاز الآخر (Answer)
-async function acceptOffer() {
-    const offer = JSON.parse(document.getElementById("offer").value);
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-    const answer = await peerConnection.createAnswer();
-    await peerConnection.setLocalDescription(answer);
-    document.getElementById("answer").value = JSON.stringify(answer);
-}
-
-// إرسال الاستجابة للطرف الآخر
-async function acceptAnswer() {
-    const answer = JSON.parse(document.getElementById("answer").value);
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-}
-
-// إرسال الملف المختار عبر WebRTC
-function sendFile() {
-    const fileInput = document.getElementById("fileInput").files[0];
-    if (fileInput && dataChannel.readyState === "open") {
-        dataChannel.send(fileInput);
-        alert("تم إرسال الملف بنجاح!");
-    } else {
-        alert("القناة غير جاهزة لإرسال الملفات!");
+    if (!fileInput || !sendFileButton || !statusDiv) {
+        console.error("حدث خطأ في تحميل العناصر! تأكد من أن لديك جميع العناصر في HTML.");
+        return;
     }
-}
 
-// تهيئة الاتصال عند بدء الصفحة
-createConnection();
+    // إنشاء قناة اتصال WebRTC
+    const peerConnection = new RTCPeerConnection();
+    const dataChannel = peerConnection.createDataChannel("fileTransfer");
 
-document.getElementById("sendButton").addEventListener("click", sendFile);
-document.getElementById("createOffer").addEventListener("click", createOffer);
-document.getElementById("acceptOffer").addEventListener("click", acceptOffer);
-document.getElementById("acceptAnswer").addEventListener("click", acceptAnswer);
+    dataChannel.onopen = () => console.log("تم فتح القناة!");
+    dataChannel.onclose = () => console.log("تم إغلاق القناة!");
+
+    sendFileButton.addEventListener("click", function () {
+        if (fileInput.files.length === 0) {
+            alert("يرجى اختيار ملف أولاً!");
+            return;
+        }
+
+        const file = fileInput.files[0];
+        if (dataChannel.readyState === "open") {
+            dataChannel.send(file);
+            statusDiv.innerHTML = `<p style="color: green;">تم إرسال الملف بنجاح!</p>`;
+        } else {
+            alert("القناة غير جاهزة لإرسال الملفات!");
+        }
+    });
+
+    // استقبال الملفات
+    peerConnection.ondatachannel = (event) => {
+        const receiveChannel = event.channel;
+        receiveChannel.onmessage = (event) => {
+            const receivedFile = event.data;
+            console.log("تم استلام الملف:", receivedFile);
+            statusDiv.innerHTML = `<p style="color: blue;">تم استلام الملف: ${receivedFile.name}</p>`;
+        };
+    };
+});
