@@ -3,17 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مشاركة الملفات</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <title>نقل الملفات</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        #fileList { margin-top: 20px; }
+    </style>
 </head>
 <body>
-    <h1>شارك الملفات بسهولة</h1>
-    <input type="file" id="fileInput">
-    <button id="sendFile">إرسال</button>
-    <div id="status"></div>
-    
-    <script src="script.js"></script>
+    <h1>نقل الملفات بين الهاتف والحاسوب</h1>
+    <input type="file" id="fileInput" multiple>
+    <button onclick="uploadFiles()">رفع الملفات</button>
+    <div id="fileList"></div>
+
+    <script>
+        let filesArray = []; // مصفوفة لتخزين الملفات مؤقتًا
+
+        function uploadFiles() {
+            const fileInput = document.getElementById('fileInput');
+            const fileList = document.getElementById('fileList');
+            filesArray = Array.from(fileInput.files); // تخزين الملفات المرفوعة
+            fileList.innerHTML = ''; // مسح القائمة السابقة
+
+            filesArray.forEach((file, index) => {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(file); // إنشاء رابط لتنزيل الملف
+                link.download = file.name; // اسم الملف عند التنزيل
+                link.textContent = `تنزيل ${file.name}`;
+                fileList.appendChild(link);
+                fileList.appendChild(document.createElement('br')); // فاصل بين الروابط
+            });
+
+            fileInput.value = ''; // إعادة تعيين حقل الإدخال
+        }
+    </script>
 </body>
 </html>
